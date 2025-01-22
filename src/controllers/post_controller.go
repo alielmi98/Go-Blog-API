@@ -33,4 +33,66 @@ func (pc *PostController) CreatePost(c *gin.Context) {
 	c.JSON(http.StatusCreated, post)
 }
 
-// Implement other CRUD operations similar to CreatePost
+func (pc *PostController) UpdatePost(c *gin.Context) {
+	var updatePostDTO dto.UpdatePostDTO
+	id := c.Params.ByName("id")
+
+	if err := c.ShouldBindJSON(&updatePostDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := pc.postService.GetPostByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	post, err := pc.postService.UpdatePost(c, id, &updatePostDTO)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
+}
+
+func (pc *PostController) DeletePost(c *gin.Context) {
+	id := c.Params.ByName("id")
+
+	_, err := pc.postService.GetPostByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	err = pc.postService.DeletePost(c, id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, "Deleted post successfully")
+}
+
+func (pc *PostController) GetPostById(c *gin.Context) {
+	id := c.Params.ByName("id")
+
+	post, err := pc.postService.GetPostByID(c, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Post not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, post)
+}
+
+func (pc *PostController) GetAllPosts(c *gin.Context) {
+	posts, err := pc.postService.GetAllPosts(c)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, posts)
+
+}

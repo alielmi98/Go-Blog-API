@@ -25,6 +25,10 @@ func RegisterRoutes(r *gin.Engine, db *mongo.Database) {
 		posts := api.Group("/posts")
 		{
 			posts.POST("/", postController.CreatePost)
+			posts.GET("/", postController.GetAllPosts)
+			posts.PUT("/:id", postController.UpdatePost)
+			posts.DELETE("/:id", postController.DeletePost)
+			posts.GET("/:id", postController.GetPostById)
 
 		}
 	}

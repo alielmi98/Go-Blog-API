@@ -8,6 +8,8 @@ type CreatePostDTO struct {
 }
 
 type UpdatePostDTO struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Title    string   `json:"title"`
+	Content  string   `json:"content"`
+	Category string   `json:"category"`
+	Tags     []string `json:"tags"`
 }
