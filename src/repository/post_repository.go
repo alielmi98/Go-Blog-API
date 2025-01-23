@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type PostRepository interface {
@@ -15,6 +16,7 @@ type PostRepository interface {
 	DeletePost(ctx context.Context, id string) error
 	GetPostByID(ctx context.Context, id string) (*models.Post, error)
 	GetAllPosts(ctx context.Context) ([]*models.Post, error)
+	GetByFilter(term string) ([]*models.Post, error)
 }
 
 type postRepository struct {
@@ -90,4 +92,38 @@ func (r *postRepository) GetAllPosts(ctx context.Context) ([]*models.Post, error
 	}
 
 	return posts, nil
+}
+
+func (r *postRepository) GetByFilter(term string) ([]*models.Post, error) {
+	ctx := context.Background()
+	var blogs []*models.Post
+
+	filter := bson.M{
+		"$or": []bson.M{
+			{"title": bson.M{"$regex": primitive.Regex{Pattern: term, Options: "i"}}},
+			{"content": bson.M{"$regex": primitive.Regex{Pattern: term, Options: "i"}}},
+			{"category": bson.M{"$regex": primitive.Regex{Pattern: term, Options: "i"}}},
+		},
+	}
+
+	options := options.Find().SetSort(bson.M{"createdAt": -1})
+	cursor, err := r.collection.Find(ctx, filter, options)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var blog models.Post
+		if err := cursor.Decode(&blog); err != nil {
+			return nil, err
+		}
+		blogs = append(blogs, &blog)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return blogs, nil
 }

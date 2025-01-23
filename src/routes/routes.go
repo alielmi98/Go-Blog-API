@@ -29,6 +29,7 @@ func RegisterRoutes(r *gin.Engine, db *mongo.Database) {
 			posts.PUT("/:id", postController.UpdatePost)
 			posts.DELETE("/:id", postController.DeletePost)
 			posts.GET("/:id", postController.GetPostById)
+			posts.GET("/filter", postController.GetByFilter)
 
 		}
 	}

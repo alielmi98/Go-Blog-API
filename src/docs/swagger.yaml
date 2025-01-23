@@ -185,4 +185,30 @@ paths:
       summary: Update an existing post
       tags:
       - posts
+  /posts/filter:
+    get:
+      description: Filter blog posts by a search term
+      parameters:
+      - description: Search term
+        in: query
+        name: term
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Post'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get Posts By Filter
+      tags:
+      - posts
 swagger: "2.0"

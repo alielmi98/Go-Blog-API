@@ -17,6 +17,7 @@ type PostService interface {
 	DeletePost(ctx context.Context, id string) error
 	GetPostByID(ctx context.Context, id string) (*models.Post, error)
 	GetAllPosts(ctx context.Context) ([]*models.Post, error)
+	GetByFilter(term string) ([]*models.Post, error)
 }
 
 type postService struct {
@@ -69,4 +70,8 @@ func (s *postService) GetPostByID(ctx context.Context, id string) (*models.Post,
 }
 func (s postService) GetAllPosts(ctx context.Context) ([]*models.Post, error) {
 	return s.postRepository.GetAllPosts(ctx)
+}
+
+func (s *postService) GetByFilter(term string) ([]*models.Post, error) {
+	return s.postRepository.GetByFilter(term)
 }

@@ -144,3 +144,22 @@ func (pc *PostController) GetAllPosts(c *gin.Context) {
 	c.JSON(http.StatusOK, posts)
 
 }
+
+// GetByFilter godoc
+// @Summary Get Posts By Filter
+// @Description Filter blog posts by a search term
+// @Tags posts
+// @Produce json
+// @Param term query string true "Search term"
+// @Success 200 {array} models.Post
+// @Failure 500 {object} map[string]interface{}
+// @Router /posts/filter [get]
+func (c *PostController) GetByFilter(ctx *gin.Context) {
+	term := ctx.Query("term")
+	posts, err := c.postService.GetByFilter(term)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, map[string]interface{}{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, posts)
+}
