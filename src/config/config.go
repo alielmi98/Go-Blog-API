@@ -18,7 +18,7 @@ type Config struct {
 
 func GetConfig() *Config {
 	return &Config{
-		MongoURI: getEnv("MONGO_URI", "mongodb://localhost:27017"),
+		MongoURI: getEnv("MONGO_URI", "mongodb://mongo_container:27017"),
 		MongoDB:  getEnv("MONGO_DB", "blog"),
 	}
 }
