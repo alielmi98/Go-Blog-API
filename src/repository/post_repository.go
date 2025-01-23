@@ -96,7 +96,7 @@ func (r *postRepository) GetAllPosts(ctx context.Context) ([]*models.Post, error
 
 func (r *postRepository) GetByFilter(term string) ([]*models.Post, error) {
 	ctx := context.Background()
-	var blogs []*models.Post
+	var posts []*models.Post
 
 	filter := bson.M{
 		"$or": []bson.M{
@@ -114,16 +114,16 @@ func (r *postRepository) GetByFilter(term string) ([]*models.Post, error) {
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var blog models.Post
-		if err := cursor.Decode(&blog); err != nil {
+		var post models.Post
+		if err := cursor.Decode(&post); err != nil {
 			return nil, err
 		}
-		blogs = append(blogs, &blog)
+		posts = append(posts, &post)
 	}
 
 	if err := cursor.Err(); err != nil {
 		return nil, err
 	}
 
-	return blogs, nil
+	return posts, nil
 }
