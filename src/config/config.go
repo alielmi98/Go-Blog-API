@@ -1,9 +1,11 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -31,11 +33,21 @@ func getEnv(key, fallback string) string {
 func ConnectDB() (*mongo.Database, error) {
 	config := GetConfig()
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
-	client, err := mongo.Connect(nil, clientOptions)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to MongoDB: %v", err)
 	}
+
+	// Check the connection
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to ping MongoDB: %v", err)
+	}
+
 	log.Printf("Successfully connected to MongoDB at %s", config.MongoURI)
 	db := client.Database(config.MongoDB)
 	return db, nil
